@@ -11,13 +11,9 @@ type Link struct {
 	URL string `json:"url"`
 }
 
-type RequestData struct {
-	URL string `json:"url"`
-}
-
 func (h *HandlerHelper) GetPageLinks(w http.ResponseWriter, r *http.Request) {
 	// decode the request JSON into the RequestData struct
-	var requestData RequestData
+	var requestData Link
 	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
 		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
 		return
