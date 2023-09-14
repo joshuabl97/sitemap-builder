@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +12,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/joshuabl97/sitemap-builder/handlers"
 	"github.com/rs/zerolog"
-	"golang.org/x/net/html"
 )
 
 var portNum = flag.String("port_number", "8080", "The port number the server runs on")
@@ -48,6 +46,7 @@ func main() {
 
 	// registering the handlers on the serve mux (sm)
 	sm.Get("/healthz", handlers.HealthzHandler)
+	sm.Get("/getLinks", hh.GetPageLinks)
 
 	// create a new server
 	s := http.Server{
@@ -97,37 +96,4 @@ type zerologLogger struct {
 func (l *zerologLogger) Write(p []byte) (n int, err error) {
 	l.logger.Error().Msg(string(p))
 	return len(p), nil
-}
-
-func getPageLinks(url string) {
-	// fetch the HTML content from the URL
-	resp, err := http.Get(url)
-	if err != nil {
-		fmt.Println("Error fetching URL:", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	// parse the HTML content
-	tokenizer := html.NewTokenizer(resp.Body)
-
-	for {
-		tokenType := tokenizer.Next()
-
-		switch tokenType {
-		case html.ErrorToken:
-			// End of the document
-			return
-		case html.StartTagToken, html.SelfClosingTagToken:
-			token := tokenizer.Token()
-			if token.Data == "a" {
-				// Found an <a> tag
-				for _, attr := range token.Attr {
-					if attr.Key == "href" {
-						fmt.Println("Link:", attr.Val)
-					}
-				}
-			}
-		}
-	}
 }
