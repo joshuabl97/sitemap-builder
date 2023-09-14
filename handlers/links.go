@@ -15,6 +15,7 @@ func (h *HandlerHelper) GetPageLinks(w http.ResponseWriter, r *http.Request) {
 	// decode the request JSON into the RequestData struct
 	var requestData Link
 	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+		h.l.Error().Msg("Invalid JSON request")
 		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
 		return
 	}
@@ -22,6 +23,7 @@ func (h *HandlerHelper) GetPageLinks(w http.ResponseWriter, r *http.Request) {
 	// fetch the HTML content from the URL
 	resp, err := http.Get(requestData.URL)
 	if err != nil {
+		h.l.Error().Msg("Error fetching URL")
 		http.Error(w, "Error fetching URL", http.StatusInternalServerError)
 		return
 	}
@@ -42,6 +44,7 @@ func (h *HandlerHelper) GetPageLinks(w http.ResponseWriter, r *http.Request) {
 			// marshal the links slice to JSON
 			jsonData, err := json.Marshal(links)
 			if err != nil {
+				h.l.Error().Msg("Error encoding JSON")
 				http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
 				return
 			}
