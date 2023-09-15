@@ -36,7 +36,7 @@ func main() {
 	errorLog := &zerologLogger{l}
 
 	// generating a type HandlerHelper for handler methods
-	hh := handlers.CreateHandlerHelper(&l)
+	hh := handlers.CreateHandlerHelper(&l, portNum)
 
 	// defining the serve mux (sm)
 	sm := chi.NewRouter()
@@ -47,6 +47,7 @@ func main() {
 	// registering the handlers on the serve mux (sm)
 	sm.Get("/healthz", handlers.HealthzHandler)
 	sm.Get("/getLinks", hh.GetPageLinks)
+	sm.Get("/sitemap", hh.SitemapGen)
 
 	// create a new server
 	s := http.Server{
